@@ -1,0 +1,874 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Hangfire.Mongo</name>
+    </assembly>
+    <members>
+        <member name="T:Hangfire.Mongo.Database.HangfireDbContext">
+            <summary>
+            Represents Mongo database context for Hangfire
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Database.HangfireDbContext.#ctor(MongoDB.Driver.MongoClient,System.String,System.String)">
+            <summary>
+            Constructs context with Mongo client and database name
+            </summary>
+            <param name="mongoClient"></param>
+            <param name="databaseName"></param>
+            <param name="prefix"></param>
+        </member>
+        <member name="P:Hangfire.Mongo.Database.HangfireDbContext.ConnectionId">
+            <summary>
+            Mongo database connection identifier
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Database.HangfireDbContext.Notifications">
+            <summary>
+            Reference to tailable collection which contains signal dtos for enqueued job items
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Database.HangfireDbContext.JobGraph">
+            <summary>
+            Reference to job graph collection
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Database.HangfireDbContext.DistributedLock">
+            <summary>
+            Reference to collection which contains distributed locks
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Database.HangfireDbContext.Schema">
+            <summary>
+            Reference to collection which contains schemas
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Database.HangfireDbContext.Server">
+            <summary>
+            Reference to collection which contains servers information
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Database.HangfireDbContext.Dispose">
+            <summary>
+            Disposes the object
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.DistributedLock.MongoDistributedLock">
+            <summary>
+            Represents distributed lock implementation for MongoDB
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.DistributedLock.MongoDistributedLock.#ctor(System.String,System.TimeSpan,Hangfire.Mongo.Database.HangfireDbContext,Hangfire.Mongo.MongoStorageOptions,Hangfire.Mongo.IDistributedLockMutex)">
+            <summary>
+            Creates MongoDB distributed lock
+            </summary>
+            <param name="resource">Lock resource</param>
+            <param name="timeout">Lock timeout</param>
+            <param name="dbContext">Lock Database</param>
+            <param name="storageOptions">Database options</param>
+            <param name="mutex"></param>
+            <exception cref="T:Hangfire.Storage.DistributedLockTimeoutException">Thrown if lock is not acquired within the timeout</exception>
+            <exception cref="T:Hangfire.Mongo.DistributedLock.MongoDistributedLockException">Thrown if other mongo specific issue prevented the lock to be acquired</exception>
+        </member>
+        <member name="M:Hangfire.Mongo.DistributedLock.MongoDistributedLock.#ctor(System.String,System.TimeSpan,MongoDB.Driver.IMongoCollection{Hangfire.Mongo.Dto.DistributedLockDto},MongoDB.Driver.IMongoCollection{Hangfire.Mongo.Dto.NotificationDto},Hangfire.Mongo.MongoStorageOptions,Hangfire.Mongo.IDistributedLockMutex)">
+            <summary>
+            Creates MongoDB distributed lock
+            </summary>
+            <param name="resource">Lock resource</param>
+            <param name="timeout">Lock timeout</param>
+            <param name="locks">Lock collection</param>
+            <param name="notifications"></param>
+            <param name="storageOptions">Database options</param>
+            <param name="mutex"></param>
+            <exception cref="T:Hangfire.Storage.DistributedLockTimeoutException">Thrown if lock is not acquired within the timeout</exception>
+            <exception cref="T:Hangfire.Mongo.DistributedLock.MongoDistributedLockException">Thrown if other mongo specific issue prevented the lock to be acquired</exception>
+        </member>
+        <member name="M:Hangfire.Mongo.DistributedLock.MongoDistributedLock.Dispose">
+            <summary>
+            Disposes the object
+            </summary>
+            <exception cref="T:Hangfire.Mongo.DistributedLock.MongoDistributedLockException"></exception>
+        </member>
+        <member name="M:Hangfire.Mongo.DistributedLock.MongoDistributedLock.Release">
+            <summary>
+            Release the lock
+            </summary>
+            <exception cref="T:Hangfire.Mongo.DistributedLock.MongoDistributedLockException"></exception>
+        </member>
+        <member name="M:Hangfire.Mongo.DistributedLock.MongoDistributedLock.StartHeartBeat">
+            <summary>
+            Starts database heartbeat
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.DistributedLock.MongoDistributedLockException">
+            <summary>
+            Represents exceptions for distributed lock implementation for MongoDB
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.DistributedLock.MongoDistributedLockException.#ctor(System.String)">
+            <summary>
+            Creates exception
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="M:Hangfire.Mongo.DistributedLock.MongoDistributedLockException.#ctor(System.String,System.Exception)">
+            <summary>
+            Creates exception with inner exception
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="innerException">Inner exception</param>
+        </member>
+        <member name="T:Hangfire.Mongo.Dto.DistributedLockDto">
+            <summary>
+            Document used for holding a distributed lock in mongo.
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Dto.DistributedLockDto.Id">
+            <summary>
+            The unique id of the document.
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Dto.DistributedLockDto.Resource">
+            <summary>
+            The name of the resource being held.
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Dto.DistributedLockDto.ExpireAt">
+            <summary>
+            The timestamp for when the lock expires.
+            This is used if the lock is not maintained or 
+            cleaned up by the owner (e.g. process was shut down).
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Dto.SchemaDto">
+            <summary>
+            Holds the schema version of the database
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Dto.SchemaDto.Version">
+            <summary>
+            The schema version
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Dto.SchemaDto.Identifier">
+            <summary>
+            The identifier of the database.
+            Will be initialized along with the database
+            and will nerver change.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.IndexMigration.TryCreateIndexes(MongoDB.Driver.IMongoCollection{MongoDB.Bson.BsonDocument},System.Func{MongoDB.Driver.FieldDefinition{MongoDB.Bson.BsonDocument},MongoDB.Driver.IndexKeysDefinition{MongoDB.Bson.BsonDocument}},System.String[])">
+            <summary>
+            Create indexes with <paramref name="indexNames"/> in the <paramref name="collection"/>.
+            If an index already exists, and it is the same, it will be overwritten.
+            If the index is different to an existing index, an exception will be thrown.
+            </summary>
+            <param name="collection">
+            The collection to create indexes in.
+            </param>
+            <param name="indexType">
+            The type of the indexes created.
+            </param>
+            <param name="indexNames">
+            The names of the indexes to create.
+            </param>
+            <returns>
+            An <see cref="T:System.Collections.Generic.IEnumerable`1"/> of the names of the indexes that were created.
+            </returns>
+            <exception cref="T:MongoDB.Driver.MongoCommandException">
+            Thrown if an existing index is attempted changed.
+            </exception>
+            <example>
+            <code>
+            collection.TryCreateIndexes(Builders{BsonDocument}.IndexKeys.Descending, "Name")
+            </code>
+            </example>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.MongoMigrationException">
+            <summary>
+            Represents exceptions for migrations
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.MongoMigrationException.#ctor(Hangfire.Mongo.Migration.Steps.IMongoMigrationStep)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Hangfire.Mongo.Migration.MongoMigrationException"/> class.
+            Generates the message based on the <paramref name="migrationStep"/>
+            </summary>
+            <param name="migrationStep">
+            The migration step that failed.
+            </param>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.MongoMigrationException.#ctor(Hangfire.Mongo.Migration.Steps.IMongoMigrationStep,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Hangfire.Mongo.Migration.MongoMigrationException"/> class.
+            Generates the message based on the <paramref name="migrationStep"/>
+            </summary>
+            <param name="migrationStep">
+            The migration step that failed.
+            </param>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.MongoMigrationException.#ctor(Hangfire.Mongo.Migration.Steps.IMongoMigrationStep,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Hangfire.Mongo.Migration.MongoMigrationException"/> class.
+            Generates the message based on the <paramref name="migrationStep"/>
+            </summary>
+            <param name="migrationStep">
+            The migration step that failed.
+            </param>
+            <param name="innerException">
+            The inner exception.
+            </param>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.MongoMigrationException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Hangfire.Mongo.Migration.MongoMigrationException"/> class.
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.MongoMigrationException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Hangfire.Mongo.Migration.MongoMigrationException"/> class.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="innerException">Inner exception</param>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.MongoMigrationManager">
+            <summary>
+            Manages migration from one schema version to the required.
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.IMongoMigrationContext">
+            <summary>
+            Bag used for parsing info between migration steps
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.MongoMigrationRunner">
+            <summary>
+            Class for running a full migration
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.MongoMigrationRunner.Execute(Hangfire.Mongo.MongoSchema,Hangfire.Mongo.MongoSchema)">
+            <summary>
+            Executes all migration steps between the given shemas.
+            </summary>
+            <param name="fromSchema">Spcifies the current shema in the database. Migration steps targeting this schema will not be executed.</param>
+            <param name="toSchema">Specifies the schema to migrate the database to. On success this will be the schema for the database.</param>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.MongoMigrationRunner.LoadMigrationSteps">
+            <summary>
+            Finds, instantiates and orders the migration steps available in this assembly.
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.MongoSchemaExtensions">
+            <summary>
+            Helpers for MongoSchema
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.IMongoMigrationStep">
+            <summary>
+            Mongo migration step.
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Migration.Steps.IMongoMigrationStep.TargetSchema">
+            <summary>
+            The schema this migration step targets.
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.Migration.Steps.IMongoMigrationStep.Sequence">
+            <summary>
+            Specifies the order migration steps for the same schema is executed.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.Steps.IMongoMigrationStep.Execute(MongoDB.Driver.IMongoDatabase,Hangfire.Mongo.MongoStorageOptions,Hangfire.Mongo.Migration.IMongoMigrationContext)">
+            <summary>
+            Executes the migration step.
+            </summary>
+            <param name="database">The mongo database.</param>
+            <param name="storageOptions">Storage options.</param>
+            <param name="migrationContext">Bag for storing data between migration steps</param>
+            <returns>True on success, else false</returns>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.RemoveObsoleteCollectionsStep">
+            <summary>
+            Removes obsolete collections from previous schema to current
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version05.CreateJobIdIndex">
+            <summary>
+            Create index for statedate collection
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version06.StateDataCreateIndex">
+            <summary>
+            Create index for statedate collection
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version06.JobMigration">
+            <summary>
+            Migrate jobs
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version06.ScheduledJobMigration">
+            <summary>
+            Migrate scheduled jobs
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version06.RecurringJobMigration">
+            <summary>
+            Migrate recurrent jobs
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version06.EnqueuedJobMigration">
+            <summary>
+            Migrate enqueued jobs
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version06.CountersMigration">
+            <summary>
+            Migrate enqueued jobs
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version06.RemoveObsoleteCollections">
+            <summary>
+            Clean up obsolete collections
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version07.StateDataRename">
+            <summary>
+            Create index for statedate collection
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version07.EnqueuedJobMigration">
+            <summary>
+            Migrate enqueued jobs
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version08.PascalCaseRename">
+            <summary>
+            Renames all properties in Hangfire collections to use PascalCase.
+            This is just in case Hangfire.Mong has been used with e.g. camelCase.
+            Migrating of snake_case, kebab-case or other casing that introduces
+            extra characters is not supported.
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.Migration.Steps.Version08.PascalCaseRename._propertyNames">
+            <summary>
+            A list of all property names used in schema version 8.
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version09.CreateSignalCollection">
+            <summary>
+            Create signal capped collection
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version10.UpdateSchemaCollection">
+            <summary>
+            Update the schema collection adding a database identifier
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version11.UseObjectIdForJob">
+            <summary>
+            Use ObjectId for jobs on job and jobQueue collections
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version12.CreateIndexes">
+            <summary>
+            Automatically create indexes
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version13.RemoveObsoleteCollections">
+            <summary>
+            Clean up obsolete collections
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version14.RemoveMergedHashDtos">
+            <summary>
+            Removes HashDto's which should have been removed in Version13 -> 'AddFieldsToHash'
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Steps.Version15.CreateUniqueLockIndex">
+            <summary>
+            Drops the existing index for the 'Resource' field of the distributed
+            lock collection and creates a new one that guarantees uniqueness.
+            This prevents a race case in which multiple Hangfire servers can 
+            acquire a lock on the same resource simultaneously.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyBase.ExistingHangfireCollectionNames(Hangfire.Mongo.MongoSchema)">
+            <summary>
+            Find hangfire collection namespaces by reflecting over properties on database.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyBase.ExistingDatabaseCollectionNames">
+            <summary>
+            Gets the existing collection names from database
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyBase.GetBackupDatabaseName(System.String,Hangfire.Mongo.MongoSchema)">
+            <summary>
+            Generate the name of tha tbackup collection based on the original collection name and schema.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyBase.GetBackupCollectionName(System.String,Hangfire.Mongo.MongoSchema)">
+            <summary>
+            Generate the name of tha tbackup collection based on the original collection name and schema.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyBase.BackupCollection(MongoDB.Driver.IMongoDatabase,System.String,System.String)">
+            <summary>
+            Backups the collection in database identified by collectionName.
+            </summary>
+            <param name="database">Referance to the mongo database.</param>
+            <param name="collectionName">The name of the collection to backup.</param>
+            <param name="backupCollectionName">Tha name of the backup collection.</param>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyDrop">
+            <summary>
+            Implements the "Drop" strategy.
+            Drops all hangfire related collections.
+            If backup is enabled, the collections will be renamed instead.
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyMigrate">
+            <summary>
+            Implements the "Migrate" strategy.
+            Migrate the hangfire collections from current schema to required
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.Migration.Strategies.MongoMigrationStrategyNone">
+            <summary>
+            Implements the "None" strategy.
+            Not much to execute just throw an exception.
+            We do not want to continue on an obsolete schema.
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoBootstrapperConfigurationExtensions">
+            <summary>
+            Represents extensions to configure MongoDB storage for Hangfire
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoBootstrapperConfigurationExtensions.UseMongoStorage(Hangfire.IGlobalConfiguration,System.String,System.String)">
+            <summary>
+            Configure Hangfire to use MongoDB storage
+            </summary>
+            <param name="configuration">Configuration</param>
+            <param name="connectionString">Connection string for Mongo database, for example 'mongodb://username:password@host:port'</param>
+            <param name="databaseName">Name of database at Mongo server</param>
+            <returns></returns>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoBootstrapperConfigurationExtensions.UseMongoStorage(Hangfire.IGlobalConfiguration,System.String,System.String,Hangfire.Mongo.MongoStorageOptions)">
+            <summary>
+            Configure Hangfire to use MongoDB storage
+            </summary>
+            <param name="configuration">Configuration</param>
+            <param name="connectionString">Connection string for Mongo database, for example 'mongodb://username:password@host:port'</param>
+            <param name="databaseName">Name of database at Mongo server</param>
+            <param name="storageOptions">Storage options</param>
+            <returns></returns>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoBootstrapperConfigurationExtensions.UseMongoStorage(Hangfire.IGlobalConfiguration,MongoDB.Driver.MongoClientSettings,System.String)">
+            <summary>
+            Configure Hangfire to use MongoDB storage
+            </summary>
+            <param name="configuration">Configuration</param>
+            <param name="mongoClientSettings">Client settings for Mongo</param>
+            <param name="databaseName">Name of database at Mongo server</param>
+            <returns></returns>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoBootstrapperConfigurationExtensions.UseMongoStorage(Hangfire.IGlobalConfiguration,MongoDB.Driver.MongoClientSettings,System.String,Hangfire.Mongo.MongoStorageOptions)">
+            <summary>
+            Configure Hangfire to use MongoDB storage
+            </summary>
+            <param name="configuration">Configuration</param>
+            <param name="mongoClientSettings">Client settings for Mongo</param>
+            <param name="databaseName">Name of database at Mongo server</param>
+            <param name="storageOptions">Storage options</param>
+            <returns></returns>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoBootstrapperConfigurationExtensions.UseMongoStorage(Hangfire.IGlobalConfiguration,MongoDB.Driver.MongoClient,System.String,Hangfire.Mongo.MongoStorageOptions)">
+            <summary>
+            Configure Hangfire to use MongoDB storage
+            </summary>
+            <param name="configuration">Configuration</param>
+            <param name="mongoClient">Client for Mongo</param>
+            <param name="databaseName">Name of database at Mongo server</param>
+            <param name="storageOptions">Storage options</param>
+            <returns></returns>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoConnectException">
+            <summary>
+            Thrown if Hangfire.Mongo is unable to connect to the database
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoConnectException.#ctor(Hangfire.Mongo.Database.HangfireDbContext,System.String,System.Exception)">
+            <summary>
+            ctor
+            </summary>
+            <param name="dbContext"></param>
+            <param name="connectionString"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoConnection">
+            <summary>
+            MongoDB database connection for Hangfire
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoExpirationManager">
+            <summary>
+            Represents Hangfire expiration manager for Mongo database
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoExpirationManager.#ctor(Hangfire.Mongo.Database.HangfireDbContext,Hangfire.Mongo.MongoStorageOptions)">
+            <summary>
+            Constructs expiration manager with one hour checking interval
+            </summary>
+            <param name="dbContext">MongoDB storage</param>
+            <param name="options"></param>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoExpirationManager.Execute(Hangfire.Server.BackgroundProcessContext)">
+            <summary>
+            Run expiration manager to remove outdated records
+            </summary>
+            <param name="context">Background processing context</param>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoExpirationManager.Execute(System.Threading.CancellationToken)">
+            <summary>
+            Run expiration manager to remove outdated records
+            </summary>
+            <param name="cancellationToken">Cancellation token</param>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoFetchedJob">
+            <summary>
+            Hangfire fetched job for Mongo database
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoFetchedJob.#ctor(Hangfire.Mongo.Database.HangfireDbContext,MongoDB.Bson.ObjectId,MongoDB.Bson.ObjectId,System.String)">
+            <summary>
+            Constructs fetched job by database connection, identifier, job ID and queue
+            </summary>
+            <param name="connection">Database connection</param>
+            <param name="id">Identifier</param>
+            <param name="jobId">Job ID</param>
+            <param name="queue">Queue name</param>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoFetchedJob.JobId">
+            <summary>
+            Job ID
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoFetchedJob.Queue">
+            <summary>
+            Queue name
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoFetchedJob.RemoveFromQueue">
+            <summary>
+            Removes fetched job from a queue
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoFetchedJob.Requeue">
+            <summary>
+            Puts fetched job into a queue
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoFetchedJob.Dispose">
+            <summary>
+            Disposes the object
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoMigrationStrategy">
+            <summary>
+            The supported migration strategies.
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoMigrationStrategy.None">
+            <summary>
+            Do not migrate. You are on your own, we will not validate the schema at all.
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoMigrationStrategy.Drop">
+            <summary>
+            Drops the entire database, if schema version is increased.
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoMigrationStrategy.Migrate">
+            <summary>
+            Migrate from old schema to new one.
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoBackupStrategy">
+            <summary>
+            The supported backup strategies during migration.
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoBackupStrategy.None">
+            <summary>
+            No backup is made before migration.
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoBackupStrategy.Collections">
+            <summary>
+            A collection-by-collection backup is made to the same database.
+            Recommended to use this if you store the Hangfire jobs in the 
+            same database as your actual application data.
+            This is the prefered and default backup strategy.
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoBackupStrategy.Database">
+            <summary>
+            Will copy the entire database into a new databse.
+            When using this backup strategy, access to the
+            "admin" database is required.
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoMigrationOptions">
+            <summary>
+            Represents options for MongoDB migration.
+            Only forward migration is suported.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoMigrationOptions.#ctor">
+            <summary>
+            Constructs migration options with default parameters.
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoMigrationOptions.#ctor(Hangfire.Mongo.MongoMigrationStrategy)">
+            <summary>
+            Constructs migration options with specific strategy.
+            </summary>
+            <param name="strategy">The migration strategy to use</param>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoMigrationOptions.Strategy">
+            <summary>
+            The strategy used for migration to newer schema versions.
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoMigrationOptions.BackupStrategy">
+            <summary>
+            The backup strategy to use before migrating.
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoMigrationOptions.BackupPostfix">
+            <summary>
+            Collection backup name postfix for all Hangfire related collections.
+            </summary>
+            <remarks>
+            The format for the backed up collection name is:
+            {collection-name}.{schema-version}.{BackupPostfix}
+            The format for the backed up database name is:
+            {database-name}-{schema-version}-{BackupPostfix}
+            </remarks>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoNotificationObserver">
+            <summary>
+            Observes if jobs are enqueued and signals 
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoSchema">
+            <summary>
+            All the hangfire mongo schema versions ever used
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.None">
+            <summary>
+            No schema
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version04">
+            <summary>
+            Schema version 4
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version05">
+            <summary>
+            Schema version 5
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version06">
+            <summary>
+            Schema version 6
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version07">
+            <summary>
+            Schema version 7
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version08">
+            <summary>
+            Schema version 8
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version09">
+            <summary>
+            Schema version 9
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version10">
+            <summary>
+            Schema version 10
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version11">
+            <summary>
+            Schema version 11
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version12">
+            <summary>
+            Schema version 12
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version13">
+            <summary>
+            Schema Version 13
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version14">
+            <summary>
+            Schema Version 14
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version15">
+            <summary>
+            Schema Version 15
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version16">
+            <summary>
+            Schema Version 16
+            </summary>
+        </member>
+        <member name="F:Hangfire.Mongo.MongoSchema.Version17">
+            <summary>
+            Schema Version 17
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoStorage">
+            <summary>
+            Hangfire Job Storage implementation for Mongo database
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.#ctor(MongoDB.Driver.MongoClientSettings,System.String)">
+            <summary>
+            Constructs Job Storage by Mongo client settings and name
+            </summary>
+            <param name="mongoClientSettings">Client settings for MongoDB</param>
+            <param name="databaseName">Database name</param>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.#ctor(MongoDB.Driver.MongoClientSettings,System.String,Hangfire.Mongo.MongoStorageOptions)">
+            <summary>
+            Constructs Job Storage by Mongo client settings, name and options
+            </summary>
+            <param name="mongoClientSettings">Client settings for MongoDB</param>
+            <param name="databaseName">Database name</param>
+            <param name="storageOptions">Storage options</param>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.#ctor(MongoDB.Driver.MongoClient,System.String,Hangfire.Mongo.MongoStorageOptions)">
+            <summary>
+            Constructs Job Storage by Mongo client, name and options
+            </summary>
+            <param name="mongoClient"></param>
+            <param name="databaseName"></param>
+            <param name="storageOptions"></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.GetMonitoringApi">
+            <summary>
+            Returns Monitoring API object
+            </summary>
+            <returns>Monitoring API object</returns>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.GetConnection">
+            <summary>
+            Returns storage connection
+            </summary>
+            <returns>Storage connection</returns>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.GetComponents">
+            <summary>
+            Returns collection of server components
+            </summary>
+            <returns>Collection of server components</returns>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.WriteOptionsToLog(Hangfire.Logging.ILog)">
+            <summary>
+            Writes storage options to log
+            </summary>
+            <param name="logger">Logger</param>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorage.ToString">
+            <summary>
+            Returns text representation of the object
+            </summary>
+        </member>
+        <member name="T:Hangfire.Mongo.MongoStorageOptions">
+            <summary>
+            Represents Hangfire storage options for MongoDB implementation
+            </summary>
+        </member>
+        <member name="M:Hangfire.Mongo.MongoStorageOptions.#ctor">
+            <summary>
+            Constructs storage options with default parameters
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.Prefix">
+            <summary>
+            Collection name prefix for all Hangfire related collections
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.QueuePollInterval">
+            <summary>
+            Poll interval for queue
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.InvisibilityTimeout">
+            <summary>
+            Invisibility timeout
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.DistributedLockLifetime">
+            <summary>
+            Lifetime of distributed lock
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.MigrationLockTimeout">
+            <summary>
+            Timeout for other process to wait before timing out when waiting for migration to complete
+            default = 30 seconds 
+            </summary>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.ClientId">
+            <summary>
+            Client identifier
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.CheckConnection">
+            <summary>
+            Ping database on startup to check connection, if false Hangfire.Mongo will not ping
+            the db and try to connect to the db using the given MongoClientSettings
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.ConnectionCheckTimeout">
+            <summary>
+            Time before cancelling ping to mongo server, if 'CheckConnection' is false, this value will be ignored
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.JobExpirationCheckInterval">
+            <summary>
+            Expiration check inteval for jobs
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.CountersAggregateInterval">
+            <summary>
+            Counters interval
+            </summary>
+        </member>
+        <member name="P:Hangfire.Mongo.MongoStorageOptions.MigrationOptions">
+            <summary>
+            The options used if migration is needed
+            </summary>
+        </member>
+    </members>
+</doc>
